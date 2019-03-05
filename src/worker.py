@@ -13,7 +13,7 @@ BATCH_DOWNLOADER_COUNT = 1
 MASTER_SERVER = "http://blogspot-comments-master.us.to"
 UPLOAD_SERVER = "http://blogstore.bot.nu"
 
-WORKER_VERSION = 3
+WORKER_VERSION = 4
 # WORKER_BATCH_SIZE = 500
 
 GET_ID_ENDPOINT = f"{MASTER_SERVER}/worker/getID&=worker_version={WORKER_VERSION}"
