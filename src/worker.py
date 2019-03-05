@@ -65,7 +65,7 @@ async def get_batch(worker_id, session):
     def fail_func(response_status):
         print(f"[get_batch] The server response was unsuccessful ({response_status}), unable to get a batch")
 
-    params = {"id": worker_id}
+    params = {"id": worker_id, "worker_version": WORKER_VERSION}
     response = await retry_request_on_fail(session.get, fail_func, True, True, GET_BATCH_ENDPOINT, params=params)
     if response and response.status == 200:
         text = await response.text()
