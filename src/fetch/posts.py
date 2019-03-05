@@ -33,9 +33,9 @@ async def get_blog_posts(blog, exclusion_limit, session):
                 if request_info.status == 200:
                     break
                 else:
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(1)
             except:
-                await asyncio.sleep(2)
+                await asyncio.sleep(1)
 
         # Check if the blog exists and is accessible
         if not request_info:
@@ -81,7 +81,7 @@ async def test():
         # blog = "https://downwindfaster.blogspot.com"
         # blog = "https://jopik.com"
         # blog = "https://audiotranscriptionusa.blogspot.com"
-        # blog = "https://doituyenbongdaanh.blogspot.com"
+        blog = "https://0102skroy.blogspot.com"
 
         post_urls = await get_blog_posts(blog, 0, session) # Retrieve the sample blog's articles
         print(f"Found {len(post_urls)} post links")
