@@ -25,7 +25,7 @@ SUBMIT_PRIVATE_BLOG_ENDPOINT = f"{MASTER_SERVER}/worker/submitPrivate"
 SUBMIT_CUSTOM_DOMAIN_ENDPOINT = f"{MASTER_SERVER}/worker/submitDomain"
 
 UPDATE_BATCH_ENDPOINT = f"{MASTER_SERVER}/worker/updateStatus"
-DOMAINS_LIST_ENDPOINT = f"{UPLOAD_SERVER}/worker/domains.txt.gz"
+#DOMAINS_LIST_ENDPOINT = f"{UPLOAD_SERVER}/worker/domains.txt.gz"
 
 SUBMIT_BATCH_UNIT = f"{UPLOAD_SERVER}/submitBatchUnit"
 # called by master
@@ -351,62 +351,62 @@ async def retry_request_on_fail(func, fail_func, check_text, check_batch_fail=Fa
     sys.exit(1)
     # return False
 
-async def download_domains():
+#async def download_domains():
 
-    class IncompleteDomains(Exception):
-        pass
+    # class IncompleteDomains(Exception):
+        # pass
 
-    async with aiohttp.ClientSession() as session:
+    # async with aiohttp.ClientSession() as session:
 
-        def fail_func(response_status):
-            print(f"Failed to get domains.txt.gz, retrying")
+        # def fail_func(response_status):
+            # print(f"Failed to get domains.txt.gz, retrying")
 
-        try:
+        # try:
 
-            domains_response = await retry_request_on_fail(session.get, fail_func, False, False, DOMAINS_LIST_ENDPOINT)
+            # domains_response = await retry_request_on_fail(session.get, fail_func, False, False, DOMAINS_LIST_ENDPOINT)
 
-            domains_length = int(domains_response.headers["Content-Length"])
+            # domains_length = int(domains_response.headers["Content-Length"])
 
-            print(f"Received content length from server: {domains_length}")
+            # print(f"Received content length from server: {domains_length}")
 
-            with open("../domains.txt.gz", "wb") as domains:
-                total_bytes_downloaded = 0
-                while True:
-                    # download in chunks of 10MB
-                    chunk = await domains_response.content.read((1000 * 1000) * 10)
-                    chunk_length = len(chunk)
-                    total_bytes_downloaded += chunk_length
-                    if total_bytes_downloaded == domains_length and chunk_length == 0:
-                        break
-                    elif chunk_length == 0:
-                        print("Sleeping", total_bytes_downloaded, domains_length, total_bytes_downloaded == domains_length)
-                        time.sleep(2)
-                    else:
-                        domains.write(chunk)
+            # with open("../domains.txt.gz", "wb") as domains:
+                # total_bytes_downloaded = 0
+                # while True:
+                    #download in chunks of 10MB
+                    # chunk = await domains_response.content.read((1000 * 1000) * 10)
+                    # chunk_length = len(chunk)
+                    # total_bytes_downloaded += chunk_length
+                    # if total_bytes_downloaded == domains_length and chunk_length == 0:
+                        # break
+                    # elif chunk_length == 0:
+                        # print("Sleeping", total_bytes_downloaded, domains_length, total_bytes_downloaded == domains_length)
+                        # time.sleep(2)
+                    # else:
+                        # domains.write(chunk)
 
-            final_file_size = os.path.getsize("../domains.txt.gz")
-            print(f"domains.txt.gz | Download finished (expected size: {domains_length}, got: {final_file_size})")
-            if final_file_size == domains_length:
-                print(f"Successfully downloaded domains.txt (expected size: {domains_length}, got: {final_file_size})")
-                print("Extracting to ../domains.txt")
-                with gzip.open("../domains.txt.gz", "rb") as f_in:
-                    with open("../domains.txt", "wb") as f_out:
-                        shutil.copyfileobj(f_in, f_out)
+            # final_file_size = os.path.getsize("../domains.txt.gz")
+            # print(f"domains.txt.gz | Download finished (expected size: {domains_length}, got: {final_file_size})")
+            # if final_file_size == domains_length:
+                # print(f"Successfully downloaded domains.txt (expected size: {domains_length}, got: {final_file_size})")
+                # print("Extracting to ../domains.txt")
+                # with gzip.open("../domains.txt.gz", "rb") as f_in:
+                    # with open("../domains.txt", "wb") as f_out:
+                        # shutil.copyfileobj(f_in, f_out)
 
-                if os.path.exists("../domains.txt.gz"):
-                    print("Deleting gzip..")
-                    os.remove("../domains.txt.gz")
-            else:
-                print(f"Domains list is incomplete. Try manually downloading in a browser\n{DOMAINS_LIST_ENDPOINT}")
-                if os.path.exists("../domains.txt.gz"):
-                    print("Deleting gzip..")
-                    os.remove("../domains.txt.gz")
-                raise IncompleteDomains("The domains list is incomplete")
-        except asyncio.TimeoutError:
-            print("Request timed out..")
-            print(f"Delete domains.txt and start the worker again, or try manually downloading and extracting the domains list from {DOMAINS_LIST_ENDPOINT}")
-            print(f"Should that also fail to download, try the same with https://archive.org/details/domains.txt")
-            exit(0)
+                # if os.path.exists("../domains.txt.gz"):
+                    # print("Deleting gzip..")
+                    # os.remove("../domains.txt.gz")
+            # else:
+                # print(f"Domains list is incomplete. Try manually downloading in a browser\n{DOMAINS_LIST_ENDPOINT}")
+                # if os.path.exists("../domains.txt.gz"):
+                    # print("Deleting gzip..")
+                    # os.remove("../domains.txt.gz")
+                # raise IncompleteDomains("The domains list is incomplete")
+        # except asyncio.TimeoutError:
+            # print("Request timed out..")
+            # print(f"Delete domains.txt and start the worker again, or try manually downloading and extracting the domains list from {DOMAINS_LIST_ENDPOINT}")
+            # print(f"Should that also fail to download, try the same with https://archive.org/details/domains.txt")
+            # exit(0)
 
 
 async def batch_downloader(worker_id, domains, session, batch_id):
@@ -470,30 +470,30 @@ if __name__ == '__main__':
         os.makedirs("../output")
 
     # download the domains list
-    if not os.path.exists("../domains.txt"):
-        print("Downloading domains list..")
-        asyncio.run(download_domains())
-        if os.path.exists("../domains.txt.gz"):
-            print("Deleting gzip..")
-            os.remove("../domains.txt.gz")
-    else:
-        file_size = os.path.getsize("../domains.txt")
-        expected_size = 122697503
-        if file_size == expected_size:
-            print("Found valid domains.txt")
-        else:
-            print(f"Domains list should be {expected_size} bytes, but it's {file_size} bytes")
-            print("Trying to re download domains.txt..")
-            try:
-                asyncio.run(download_domains())
-                if os.path.exists("../domains.txt.gz"):
-                    print("Deleting gzip..")
-                    os.remove("../domains.txt.gz")
-            except:
-                print("Failed to redownload domains list..")
-                print(f"Delete domains.txt and start the worker again, or try manually downloading and extracting the domains list from {DOMAINS_LIST_ENDPOINT}")
-                print(f"Should that also fail to download, try with https://archive.org/details/domains.txt")
-                exit(0)
+    # if not os.path.exists("../domains.txt"):
+        # print("Downloading domains list..")
+        # asyncio.run(download_domains())
+        # if os.path.exists("../domains.txt.gz"):
+            # print("Deleting gzip..")
+            # os.remove("../domains.txt.gz")
+    # else:
+        # file_size = os.path.getsize("../domains.txt")
+        # expected_size = 122697503
+        # if file_size == expected_size:
+            # print("Found valid domains.txt")
+        # else:
+            # print(f"Domains list should be {expected_size} bytes, but it's {file_size} bytes")
+            # print("Trying to re download domains.txt..")
+            # try:
+                # asyncio.run(download_domains())
+                # if os.path.exists("../domains.txt.gz"):
+                    # print("Deleting gzip..")
+                    # os.remove("../domains.txt.gz")
+            # except:
+                # print("Failed to redownload domains list..")
+                # print(f"Delete domains.txt and start the worker again, or try manually downloading and extracting the domains list from {DOMAINS_LIST_ENDPOINT}")
+                # print(f"Should that also fail to download, try with https://archive.org/details/domains.txt")
+                # exit(0)
 
 
     asyncio.run(main())
