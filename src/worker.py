@@ -173,9 +173,9 @@ async def upload_batch(worker_id, batch_id, random_key, version, file_path, file
         print(f"Unable to upload batch: worker_id: {worker_id} batch_id: {batch_id} | file_path: {file_path}")
         return False
 
-async def download_batch(worker_id, batch_id, batch_type, batch_content, random_key, batch_size, offset, domains, exclusion_limit, session):
+async def download_batch(worker_id, batch_id, batch_type, batch_content, random_key, batch_size, exclusion_limit, session): #offset, domains, batch_type, 
 
-    domains.seek(offset)
+    #domains.seek(offset)
 
     file_path = "../output/"
     batch_file = BatchFile(file_path, batch_id)
@@ -253,26 +253,26 @@ async def download_batch(worker_id, batch_id, batch_type, batch_content, random_
                 batch_file.start_blog(WORKER_VERSION, blog_name, blog_domain, "a", first_blog)
                 batch_file.end_blog()
 
-    if batch_type == "list":
+    #if batch_type == "list":
         # batch_size = 5
-        print("Downloading multiple domains (list)")
-        for i in range(batch_size):
-            print(f"[BATCH PROGRESS] {i}/{batch_size}")
-            blog_name = domains.readline().replace("\n", "")
-            if blog_name != "":
-                first_blog = (i == 0)
-                await download_blog(blog_name, first_blog)
-            else:
-                print("Reached end of domains list")
+    print("Downloading domains (list)")
+    for i in range(len(batch_content)):
+        print(f"[BATCH PROGRESS] {i}/{len(batch_content)}")
+        blog_name = batch_content[i]
+        #if blog_name != "":
+        first_blog = (i == 0)
+        await download_blog(blog_name, first_blog)
+        #else:
+        #    print("Reached end of domains list")
 
-    elif batch_type == "domain":
-        if batch_content != "":
-            print(f"Downloading single domain: {batch_content}")
-            await download_blog(batch_content, True)
-        else:
-            raise Exception(f"Invalid batch_content: {batch_content}")
-    else:
-        raise Exception("Invalid batch_type")
+    #elif batch_type == "domain":
+    #    if batch_content != "":
+    #        print(f"Downloading single domain: {batch_content}")
+    #        await download_blog(batch_content, True)
+    #    else:
+    #        raise Exception(f"Invalid batch_content: {batch_content}")
+    #else:
+    #    raise Exception("Invalid batch_type")
 
     batch_file.end_batch()
 
@@ -420,20 +420,16 @@ async def batch_downloader(worker_id, session, batch_id):
             batch_id = batch["batch_id"]
             batch_type = batch["batch_type"]
             random_key = batch["random_key"]
-            batch_content = batch["content"]
+            batch_content = batch["content"].split(',')
             batch_size = batch["batch_size"]
-            offset = int(batch["file_offset"])
+            #offset = int(batch["file_offset"])
             exclusion_limit = int(batch["exclusion_limit"])
             
-            with open(str(batch_id)+'.txt', 'w') as domainsw:
-                domainsw.write('\n'.join(batch_content.split(','))
-            
             batch_result = None
-            
-            with open(str(batch_id)+'.txt', 'r') as domains:
+
                 for i in range(3):
                     try:
-                        batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, batch_size, offset, domains, exclusion_limit, session)
+                        batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, exclusion_limit, session) # batch_type, batch_size, offset,
                         break
                     except Exception as e:
                         print(f"Error: {e}\nRetrying downloading of batch in 10 seconds: batch_id: {batch_id}")
