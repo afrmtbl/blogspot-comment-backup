@@ -190,6 +190,7 @@ async def download_batch(worker_id, batch_id, batch_type, batch_content, random_
             try:
                 print(f"Downloading blog: {blog_name}")
                 blog_posts = await get_blog_posts(f"https://{blog_name}.blogspot.com", exclusion_limit, session)
+
                 for i, post in enumerate(blog_posts):
                     if post.startswith("https:///"):
                         blog_posts[i] = post.replace("https://", f"https://{blog_name}.blogspot.com")
@@ -429,7 +430,7 @@ async def batch_downloader(worker_id, session, batch_id):
 
             for i in range(3):
                 try:
-                    batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, exclusion_limit, session) # batch_type, batch_size, offset,
+                    batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, batch_size, exclusion_limit, session) # batch_type, batch_size, offset,
                     break
                 except Exception as e:
                     print(f"Error: {e}\nRetrying downloading of batch in 10 seconds: batch_id: {batch_id}")
