@@ -409,7 +409,7 @@ async def retry_request_on_fail(func, fail_func, check_text, check_batch_fail=Fa
             # exit(0)
 
 
-async def batch_downloader(worker_id, domains, session, batch_id):
+async def batch_downloader(worker_id, session, batch_id):
     while True:
         print("Requesting new batch...")
         batch = await get_batch(worker_id, session)
@@ -423,16 +423,20 @@ async def batch_downloader(worker_id, domains, session, batch_id):
             batch_size = batch["batch_size"]
             offset = int(batch["file_offset"])
             exclusion_limit = int(batch["exclusion_limit"])
-
+            
+            with open(str(batch_id)+'.txt', 'w') as domainsw:
+                domainsw.write('\n'.join(batch_content.split(','))
+            
             batch_result = None
-
-            for i in range(3):
-                try:
-                    batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, batch_size, offset, domains, exclusion_limit, session)
-                    break
-                except Exception as e:
-                    print(f"Error: {e}\nRetrying downloading of batch in 10 seconds: batch_id: {batch_id}")
-                    await asyncio.sleep(10)
+            
+            with open(str(batch_id)+'.txt', 'r') as domains:
+                for i in range(3):
+                    try:
+                        batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, batch_size, offset, domains, exclusion_limit, session)
+                        break
+                    except Exception as e:
+                        print(f"Error: {e}\nRetrying downloading of batch in 10 seconds: batch_id: {batch_id}")
+                        await asyncio.sleep(10)
 
             if not batch_result:
                 print(f"Unable to download batch | batch_id: {batch_id}, requesting new batch in 10 seconds")
@@ -447,20 +451,20 @@ async def main():
 
     # logging.basicConfig(format="%(message)s", level=logging.INFO)
 
-    with open("../domains.txt", "r") as domains:
-        async with aiohttp.ClientSession() as session:
-            print("Requesting worker ID")
-            worker_id = await get_worker_id(session)
-            # worker_id = "27747438-9825-51e1-9578-8807297944e6"
-            if worker_id:
-                batch_downloader_tasks = []
-                print(f"Received worker ID: {worker_id}")
-                for i in range(BATCH_DOWNLOADER_COUNT):
-                    task = asyncio.create_task(batch_downloader(worker_id, domains, session, i))
-                    batch_downloader_tasks.append(task)
+    #with open("../domains.txt", "r") as domains:
+    async with aiohttp.ClientSession() as session:
+        print("Requesting worker ID")
+        worker_id = await get_worker_id(session)
+        # worker_id = "27747438-9825-51e1-9578-8807297944e6"
+        if worker_id:
+            batch_downloader_tasks = []
+            print(f"Received worker ID: {worker_id}")
+            for i in range(BATCH_DOWNLOADER_COUNT):
+                task = asyncio.create_task(batch_downloader(worker_id, session, i))
+                batch_downloader_tasks.append(task)
 
-                await asyncio.gather(*batch_downloader_tasks)
-                print("All batch downloaders done")
+            await asyncio.gather(*batch_downloader_tasks)
+            print("All batch downloaders done")
 
 if __name__ == '__main__':
     killer = GracefulKiller()
