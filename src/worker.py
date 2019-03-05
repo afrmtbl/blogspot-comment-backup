@@ -13,7 +13,10 @@ BATCH_DOWNLOADER_COUNT = 1
 MASTER_SERVER = "http://blogspot-comments-master.us.to"
 UPLOAD_SERVER = "http://blogstore.bot.nu"
 
-GET_ID_ENDPOINT = f"{MASTER_SERVER}/worker/getID"
+WORKER_VERSION = 3
+# WORKER_BATCH_SIZE = 500
+
+GET_ID_ENDPOINT = f"{MASTER_SERVER}/worker/getID&=worker_version={WORKER_VERSION}"
 # worker id must be provided as a query parameter: id={ID}
 GET_BATCH_ENDPOINT = f"{MASTER_SERVER}/worker/getBatch"
 SUBMIT_EXCLUSION_BLOG_ENDPOINT = f"{MASTER_SERVER}/worker/submitExclusion"
@@ -27,9 +30,6 @@ DOMAINS_LIST_ENDPOINT = f"{UPLOAD_SERVER}/worker/domains.txt.gz"
 SUBMIT_BATCH_UNIT = f"{UPLOAD_SERVER}/submitBatchUnit"
 # called by master
 # VERIFY_BATCH_UNIT = f"{UPLOAD_SERVER}/getVerifyBatchUnit"
-
-WORKER_VERSION = 3
-# WORKER_BATCH_SIZE = 500
 
 # Stop trying to connect to master after 18 hours
 MASTER_SLEEP_TOTAL = (60 * 60) * 18
