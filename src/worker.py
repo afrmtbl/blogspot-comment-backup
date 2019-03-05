@@ -16,7 +16,7 @@ UPLOAD_SERVER = "http://blogstore.bot.nu"
 WORKER_VERSION = 4
 # WORKER_BATCH_SIZE = 500
 
-GET_ID_ENDPOINT = f"{MASTER_SERVER}/worker/getID&=worker_version={WORKER_VERSION}"
+GET_ID_ENDPOINT = f"{MASTER_SERVER}/worker/getID"
 # worker id must be provided as a query parameter: id={ID}
 GET_BATCH_ENDPOINT = f"{MASTER_SERVER}/worker/getBatch"
 SUBMIT_EXCLUSION_BLOG_ENDPOINT = f"{MASTER_SERVER}/worker/submitExclusion"
@@ -55,7 +55,8 @@ async def get_worker_id(session):
     def fail_func(response_status):
         print(f"[get_worker_id] The server response was unsuccessful ({response_status}), unable to get a worker ID")
 
-    response = await retry_request_on_fail(session.get, fail_func, True, False, GET_ID_ENDPOINT)
+    params = {"worker_version": WORKER_VERSION}
+    response = await retry_request_on_fail(session.get, fail_func, True, False, GET_ID_ENDPOINT, params=params)
     if response and response.status == 200:
         text = await response.text()
         return text
