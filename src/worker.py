@@ -427,13 +427,13 @@ async def batch_downloader(worker_id, session, batch_id):
             
             batch_result = None
 
-                for i in range(3):
-                    try:
-                        batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, exclusion_limit, session) # batch_type, batch_size, offset,
-                        break
-                    except Exception as e:
-                        print(f"Error: {e}\nRetrying downloading of batch in 10 seconds: batch_id: {batch_id}")
-                        await asyncio.sleep(10)
+            for i in range(3):
+                try:
+                    batch_result = await download_batch(worker_id, batch_id, batch_type, batch_content, random_key, exclusion_limit, session) # batch_type, batch_size, offset,
+                    break
+                except Exception as e:
+                    print(f"Error: {e}\nRetrying downloading of batch in 10 seconds: batch_id: {batch_id}")
+                    await asyncio.sleep(10)
 
             if not batch_result:
                 print(f"Unable to download batch | batch_id: {batch_id}, requesting new batch in 10 seconds")
