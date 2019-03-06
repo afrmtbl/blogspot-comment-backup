@@ -197,14 +197,14 @@ async def download_batch(worker_id, batch_id, batch_type, batch_content, random_
                 # The blog cannot be found / is deleted
                 if blog_posts == "nf":
                     print(f"Marking as deleted: batch_id: {batch_id} | blog_name: {blog_name}")
-                    await submit_deleted(worker_id, batch_id, random_key, blog_name, session)
+                    #await submit_deleted(worker_id, batch_id, random_key, blog_name, session)
                     blog_domain = f"{blog_name}.blogspot.com"
                     batch_file.start_blog(WORKER_VERSION, blog_name, blog_domain, "d", first_blog)
                     batch_file.end_blog()
                 # The blog is private
                 elif blog_posts == "pr":
                     print(f"Marking as private: batch_id: {batch_id} | blog_name: {blog_name}")
-                    await submit_private(worker_id, batch_id, random_key, blog_name, session)
+                    #await submit_private(worker_id, batch_id, random_key, blog_name, session)
                     blog_domain = f"{blog_name}.blogspot.com"
                     batch_file.start_blog(WORKER_VERSION, blog_name, blog_domain, "p", first_blog)
                     batch_file.end_blog()
