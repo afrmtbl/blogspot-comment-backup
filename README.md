@@ -2,6 +2,11 @@
 # blogspot-comment-backup
 A project to archive comments from [blogspot](https://www.blogger.com/) blogs
 
+\***Google+ Blogspot comments are no longer available. You can now download the data we were able to save. Thanks for the help!**
+
+[Searchable Index](https://ia801405.us.archive.org/9/items/Blogspot_GPlus_Comments_Index/index.html) |
+[archive.org](https://archive.org/details/Blogspot_GPlus_Comments)
+
 ### Running this worker:
 \***python version 3.7 or later is required**
 
